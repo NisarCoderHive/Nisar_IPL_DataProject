@@ -1,6 +1,6 @@
 
 const csv=require('csvtojson');
-
+const fs = require('fs')
 async function matchesPlayedPerYear(){
 
     let finalresult = {};
@@ -25,7 +25,9 @@ async function matchesPlayedPerYear(){
         console.log(err)    
     }
     
+console.log(typeof finalresult)
 console.log(finalresult)
+fs.writeFileSync('../output/a.json', JSON.stringify(finalresult))
 }
 
 matchesPlayedPerYear();

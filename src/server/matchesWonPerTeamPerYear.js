@@ -9,13 +9,14 @@ async function matchesWonPerTeam(){
         const matches = await csv().fromFile('../data/matches.csv');
 
         let years = matches.map( match => match.season)
-
+        
         let winnerTeams = matches.map( match => match.winner)
 
         winnerTeams =new Set(winnerTeams)
 
         years = new Set(years);
 
+        console.log(years) ;
         let countWinnerTeam = {}; 
 
         years.forEach( year => {
@@ -25,8 +26,7 @@ async function matchesWonPerTeam(){
             for( let j=0 ; j < matches.length  ; j++)
              {
                 if( year == matches[j]['season'] && team == matches[j]['winner']){
-
-                count++;
+                     count++;
               }
               
             }
