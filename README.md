@@ -7,17 +7,12 @@ ex : cd Nisar_IPL_DataProject\src\server
 Install the module
 
 > npm install csvtojson
+> npm install fs
 
 Run the node scripts 
 
- a) > node matchesPlayerPerYear
+>node index
  
- b) > node matchesWonPerTeamPerYear
- 
-
- c) > runsConcededPerTeam
- 
- d) > topTenBowlers
 
 
 
