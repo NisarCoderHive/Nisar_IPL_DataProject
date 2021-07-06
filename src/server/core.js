@@ -1,165 +1,108 @@
 const csv = require('csvtojson');
 
-async function matchesPlayedPerYear(results){
-//remove async
-    let finalresult = {};
-    try 
+function matchesPlayedPerYear(matches){
+ try 
     {
-        //const results=await csv().fromFile('../data/matches.csv');
-        let years = results.map(data =>data.season)
-        years = new Set(years); 
-        years.forEach(year =>{
-         let count=0;
-            for(let j=0 ; j < results.length  ; j++)
-             {
-                if(year == results[j]['season']){
-                count++;
-              }
+        return matches.reduce((matchesPerYear, match) => {
+            const season = match.season;
+            if (matchesPerYear.hasOwnProperty(season)) {
+              matchesPerYear[season] += 1;
+            } else {
+              matchesPerYear[season] = 1;
             }
-        finalresult[year]= count;
-    });
+            return matchesPerYear;
+          }, {});
     }
     catch(err){
         console.log(err)    
     }
-return finalresult;
+
 }
 
-
-async function matchesWonPerTeam(matches){
-
-    let matchesWonPerTeamPerYear = {};
-    try 
-    {
-        //const matches = await csv().fromFile('../data/matches.csv');
-
-        let years = matches.map( match => match.season)
-        
-        let winnerTeams = matches.map( match => match.winner)
-
-        winnerTeams =new Set(winnerTeams)
-
-        years = new Set(years);
-
-        console.log(years) ;
-        let countWinnerTeam = {}; 
-
-        years.forEach( year => {
-            winnerTeams.forEach( team => {
-            let count = 0;
-            
-            for( let j=0 ; j < matches.length  ; j++)
-             {
-                if( year == matches[j]['season'] && team == matches[j]['winner']){
-                     count++;
-              }
-              
+function matchesWonPerTeam(matches){
+    try{ 
+        return  matches.reduce((matchesWon, match)=>{
+        const year = match.season ;
+        if(matchesWon.hasOwnProperty(year)){
+            const team = match.winner ;
+            if(matchesWon[year].hasOwnProperty(team))
+            {
+                matchesWon[year][team] += 1;
             }
-            if( count != 0 )
-             countWinnerTeam[team] = count;
-        });
-        matchesWonPerTeamPerYear [year]= countWinnerTeam;
-    });
-}
-    catch(err){
-        console.log(err)    
+            else{
+                matchesWon[year][team] = 1;
+            }
+        }
+        else{
+            const team = match.winner ;
+            matchesWon[year] = {};
+            matchesWon[year][team] = 1;
+        }
+        return matchesWon;
+    },{});
+}catch(err){
+    console.log(err)    
     }
-
-return matchesWonPerTeamPerYear  ;
 }
 
 function runsConcededPerTeam(matches, deliveries ,year){
-    let runsExtraConcededPerTeam = {};
-      
-        try 
+    let extraRunsConceded = {};
+    try 
         {
-            //let matches = await csv().fromFile('../data/matches.csv');
-            //let deliveries = await csv().fromFile('../data/deliveries.csv');
-            matches = matches.filter( match => { if( match.season == year ) return match['id']});
-            let deliveriesYear= [];
-            matches.forEach(match =>{
-                for(let i = 0 ; i < deliveries.length ;i++)
-                {
-                    if( match['id'] == deliveries[i]['match_id'] )
-                        deliveriesYear.push(deliveries[i])
-                }
-                
-            });
-    
-            deliveries = deliveriesYear ;
-            let bowlingTeams = deliveries.map(matchId => matchId['bowling_team']);
-            bowlingTeams = new Set(bowlingTeams);
-            bowlingTeams.forEach( bowlingTeam => {
-                let sum = 0;
-                for( let j = 0 ; j < deliveries.length  ; j++)
-                 {
-                    if( bowlingTeam == deliveries[j]['bowling_team'] ){
-                        sum = sum + Number(deliveries[j]['extra_runs'])
-                      }
-                }
-                runsExtraConcededPerTeam[bowlingTeam] = sum ;
+            matche = matches.filter( match =>  match.season == year);
+            matche.forEach(match =>{
+            deliveries.forEach(delivery =>{
+                  if(match.id == delivery.match_id){
+                      const bowlingTeam = delivery.bowling_team;
+                    if(extraRunsConceded.hasOwnProperty(bowlingTeam)){
+                        extraRunsConceded[bowlingTeam] += parseInt(delivery['extra_runs']) ;
+                        }else{
+                            extraRunsConceded[bowlingTeam] = parseInt(delivery['extra_runs']);
+                        }
+                  }
                 });
-    }
+            });
+        }
         catch(err){
             console.log(err)    
         }
-        
-        return runsExtraConcededPerTeam ;
-    }
+        return extraRunsConceded;
 
+}
     
-    function topTenBowlers(matches,deliveries,year){
-        let topTenBowlers = {};
-        let bowlers;
-        let results = [];
-            try 
-            {
-                //let matches = await csv().fromFile('../data/matches.csv');
-                //let deliveries = await csv().fromFile('../data/deliveries.csv');
-                matches = matches.filter( match =>  match['season'] == year );
-                /*matchIds.forEach(matchID =>
-                    deliveries = deliveries.filter(delivery => delivery['id'] == matchID['match_id']));*/
-                let deliveriesYear= [];
-                matches.forEach(match =>{
-                        for(let i = 0 ; i < deliveries.length ;i++)
-                        {
-                            if( match['id'] == deliveries[i]['match_id'] )
-                                deliveriesYear.push(deliveries[i])
+function topTenBowlers(matches,deliveries,year){
+    let totalBowlers = {};
+    try{
+        matches = matches.filter( match =>  match['season'] == year );
+            matches.forEach(match =>{
+                deliveries.forEach(delivery =>{
+                    if(match.id == delivery.match_id){
+                        const bowlerName = delivery.bowler;
+                        if(totalBowlers.hasOwnProperty(bowlerName)){
+                            totalBowlers[bowlerName] += Number(delivery.total_runs)
+                        }else{
+                            totalBowlers[bowlerName] = Number(delivery.total_runs)
                         }
-                        
-                });
-                deliveries = deliveriesYear ;
-                let bowlers = deliveries.map(delivery => delivery['bowler'])
-                bowlers = new Set(bowlers)
-                bowlers.forEach(bowler => {
-                let totalRuns = 0;
-                let bowlerRuns = {};
-                for(let i = 0 ; i < deliveries.length ; i++){
-                    if(deliveries[i]['bowler'] == bowler )
-                            {
-                                totalRuns += Number(deliveries[i]['total_runs']);
-                            }
-                        }
-                bowlerRuns['bowler'] = bowler;
-                bowlerRuns['runs'] = totalRuns;
-                results.push(bowlerRuns);
-                })
-                
-                results.sort((obj1,obj2) => obj1['runs']-obj2['runs'])
-                let outputResults = [];
-                // console.log('Top 10 economical bowlers of 2016')
-                for(let i = 0 ; i < 10 ; i++){
-                    outputResults.push(results[i]);
                 }
-                    return outputResults ;
-                }
-               
-             catch(err){
+            });
+        });
+        let result =[];
+        for (const [key, value] of Object.entries(totalBowlers)) {
+            let obj={};
+            obj['BowlerName']= key ;
+            obj['runs'] = value;
+            result.push(obj)
+        }
+        result.sort((obj1,obj2) =>obj1['runs'] -obj2['runs']);
+        let finalresult = [];
+        for( i = 0 ;i < 10 ;i++){
+            finalresult.push(result[i])
+        }
+        return finalresult;
+        }catch(err){
                  console.log(err)    
             }
-          }
-        
-
+    }
 
 module.exports ={
  matchesPlayedPerYear,
