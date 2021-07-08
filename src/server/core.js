@@ -1,8 +1,7 @@
 const csv = require('csvtojson');
 
 function matchesPlayedPerYear(matches){
- try 
-    {
+    try{
         return matches.reduce((matchesPerYear, match) => {
             const season = match.season;
             if (matchesPerYear.hasOwnProperty(season)) {
@@ -16,7 +15,6 @@ function matchesPlayedPerYear(matches){
     catch(err){
         console.log(err)    
     }
-
 }
 
 function matchesWonPerTeam(matches){
@@ -46,52 +44,46 @@ function matchesWonPerTeam(matches){
 }
 
 function runsConcededPerTeam(matches, deliveries ,year){
-    let extraRunsConceded = {};
-    try 
-        {
-            matche = matches.filter( match =>  match.season == year);
-            matche.forEach(match =>{
-            deliveries.forEach(delivery =>{
-                  if(match.id == delivery.match_id){
-                      const bowlingTeam = delivery.bowling_team;
-                    if(extraRunsConceded.hasOwnProperty(bowlingTeam)){
-                        extraRunsConceded[bowlingTeam] += parseInt(delivery['extra_runs']) ;
-                        }else{
-                            extraRunsConceded[bowlingTeam] = parseInt(delivery['extra_runs']);
-                        }
-                  }
-                });
-            });
-        }
-        catch(err){
-            console.log(err)    
-        }
-        return extraRunsConceded;
+    try{
+    matches = matches.filter(match => { if (match.season == year) return match['id'] }).map(m=>m.id);
+    return deliveries.reduce((extraRunsConceded, delivery) => {
+        if (delivery['match_id'] in matches) {
+            const bowlingTeam = delivery['bowling_team'];
+                     if(bowlingTeam in extraRunsConceded){
+                       extraRunsConceded[bowlingTeam] += parseInt(delivery['extra_runs']) ;
+                    }else{
+                        extraRunsConceded[bowlingTeam] = parseInt(delivery['extra_runs']);
+                    }
+               }
+            return extraRunsConceded;   
+    },{});
 
+    }catch(err){
+        console.log(err)
+    }
 }
     
 function topTenBowlers(matches,deliveries,year){
     let totalBowlers = {};
     try{
-        matches = matches.filter( match =>  match['season'] == year );
-            matches.forEach(match =>{
-                deliveries.forEach(delivery =>{
-                    if(match.id == delivery.match_id){
-                        const bowlerName = delivery.bowler;
-                        if(totalBowlers.hasOwnProperty(bowlerName)){
-                            totalBowlers[bowlerName] += Number(delivery.total_runs)
-                        }else{
-                            totalBowlers[bowlerName] = Number(delivery.total_runs)
-                        }
-                }
-            });
-        });
-        let result =[];
-        for (const [key, value] of Object.entries(totalBowlers)) {
-            let obj={};
-            obj['BowlerName']= key ;
-            obj['runs'] = value;
-            result.push(obj)
+        matches = matches.filter(match => { if (match.season == year) return match['id'] }).map(m=>m.id);
+    totalBowlers = deliveries.reduce((totalBowlers, delivery) => {
+        if (delivery['match_id'] in matches) {
+            const bowlerName = delivery.bowler;
+                     if(bowlerName in totalBowlers){
+                       totalBowlers[bowlerName] += parseInt(delivery['total_runs']) ;
+                    }else{
+                        totalBowlers[bowlerName] = parseInt(delivery['total_runs']);
+                    }
+               }
+            return totalBowlers;   
+    },{});
+    let result =[];
+    for (const [key, value] of Object.entries(totalBowlers)) {
+        let obj={};
+        obj['BowlerName']= key ;
+        obj['runs'] = value;
+        result.push(obj)
         }
         result.sort((obj1,obj2) =>obj1['runs'] -obj2['runs']);
         let finalresult = [];
@@ -99,7 +91,7 @@ function topTenBowlers(matches,deliveries,year){
             finalresult.push(result[i])
         }
         return finalresult;
-        }catch(err){
+    }catch(err){
                  console.log(err)    
             }
     }
