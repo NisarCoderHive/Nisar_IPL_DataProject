@@ -31,6 +31,6 @@ const  storeToJson = (data,location)=>{
     try {
         fs.writeFileSync(location, JSON.stringify(data))
       } catch (err) {
-        console.error('error is occurred at writing file',err)
+        console.error(err);
       }
 }
