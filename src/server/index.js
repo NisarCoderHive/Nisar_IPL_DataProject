@@ -11,29 +11,25 @@ csv()
         output = getdata.matchesWonPerTeam(matches)
         storeToJson(output,'../output/matchesWonPerTeamPerYear.json')
         }catch (err) {
-        console.error('error -  writing To File',err)
+        console.error(err)
       }
-
-    csv()
-    .fromFile('../data/deliveries.csv') // Promise To Retrieve the deliveries data
-    .then((deliveries)=>
-    {
-       try{
+      csv()
+      .fromFile('../data/deliveries.csv') // Promise To Retrieve the deliveries data
+      .then((deliveries)=>{
+        try{
            let output = getdata.runsConcededPerTeam(matches,deliveries,2016);
            storeToJson(output, '../output/extraRunsConcededPerTeam.json')
            output = getdata.topTenBowlers(matches,deliveries,2016);
            storeToJson(output, '../output/topTenBowlers.json')
-       }
-       catch(err){
+        }catch(err){
            console.log(err)
-       }
+        }
    });
 });
 // Function to store json data
 const  storeToJson = (data,location)=>{
     try {
-        //console.log(JSON.stringify(data));
-         fs.writeFileSync(location, JSON.stringify(data))
+        fs.writeFileSync(location, JSON.stringify(data))
       } catch (err) {
         console.error('error is occurred at writing file',err)
       }
