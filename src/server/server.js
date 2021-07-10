@@ -36,6 +36,39 @@ const server = http.createServer((request,response)=>{
         errorHandler(res,err)
     })
     }
+    else if(request.url == "/matchesWonPerTeamPerYear.json"){
+        let result = getContent("../output/matchesWonPerTeamPerYear.json")
+        .then((content)=>{
+            response.writeHead(200,{'Content-Type':'application/json'})
+            response.write(content);
+            response.end();
+        })
+        .catch((err)=>{
+            errorHandler(res,err)
+        })
+    }
+    else if(request.url == "/extraRunsConcededPerTeam.json"){
+        let result = getContent("../extraRunsConcededPerTeam.json")
+        .then((content)=>{
+            response.writeHead(200,{'Content-Type':'application/json'})
+            response.write(content);
+            response.end();
+            })
+            .catch((err)=>{
+                errorHandler(res,err)
+            })
+    }
+    else if(request.url == "/topTenBowlers.json"){
+        let result = getContent("../output/topTenBowlers.json")
+        .then((content)=>{
+            response.writeHead(200,{'Content-Type':'application/json'})
+            response.write(content);
+            response.end();
+        })
+        .catch((err)=>{
+            errorHandler(res,err)
+        })
+    }
     else if(request.url == "/app.js"){
     let result = getContent("../public/app.js")
     .then((content)=>{
@@ -68,4 +101,4 @@ let getContent = (location)=>{
 }
 
 server.listen(3000);
-console.log('Server Started')
+console.log('Server Running.......')
