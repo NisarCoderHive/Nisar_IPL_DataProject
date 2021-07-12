@@ -1,6 +1,9 @@
 const csv = require('csvtojson');
 
 function matchesPlayedPerYear(matches){
+    if (typeof matches === 'undefined' || matches.length == 0 ) {
+        throw new Error("No Matches Data Passed");
+      }
     try{
         return matches.reduce((matchesPerYear, match) => {
             const season = match.season;
@@ -57,7 +60,6 @@ function runsConcededPerTeam(matches, deliveries ,year){
                }
             return extraRunsConceded;   
     },{});
-
     }catch(err){
         console.log(err)
     }
@@ -67,7 +69,7 @@ function topTenBowlers(matches,deliveries,year){
     let totalBowlers = {};
     try{
         matches = matches.filter(match => { if (match.season == year) return match['id'] }).map(m=>m.id);
-    totalBowlers = deliveries.reduce((totalBowlers, delivery) => {
+        totalBowlers = deliveries.reduce((totalBowlers, delivery) => {
         if (delivery['match_id'] in matches) {
             const bowlerName = delivery.bowler;
                      if(bowlerName in totalBowlers){
@@ -90,7 +92,12 @@ function topTenBowlers(matches,deliveries,year){
         for( i = 0 ;i < 10 ;i++){
             finalresult.push(result[i])
         }
-        return finalresult;
+        var res= {}
+        for(obj of finalresult){
+        res[obj['BowlerName']]= obj['runs'];
+        }
+
+        return res;
     }catch(err){
                  console.log(err)    
             }
