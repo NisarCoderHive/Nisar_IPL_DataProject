@@ -1,6 +1,10 @@
-const getdata = require('./core');
-const csv = require('csvtojson');
 const fs = require('fs');
+
+const csv = require('csvtojson');
+
+const getdata = require('./core');
+
+
 csv()
 .fromFile('../data/matches.csv') // Promise To Retrieve the matches data 
 .then((matches)=>{
@@ -29,7 +33,7 @@ csv()
 // Function to store json data
 const  storeToJson = (data,location)=>{
     try {
-        fs.writeFileSync(location, JSON.stringify(data))
+         fs.writeFile(location, JSON.stringify(data),()=>{console.log(location +"fIleCreated")})
       } catch (err) {
         console.error(err);
       }
