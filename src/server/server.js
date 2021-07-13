@@ -1,84 +1,35 @@
 const http = require('http');
 const fs = require('fs');
-const { url } = require('inspector');
-const server = http.createServer((request,response)=>{
-    if(request.url == "/"){
-        let result = getContent("../public/index.html")
+const URL = 
+    { "/"         : { location :"../public/index.html",
+                     type : {'Content-Type':'text/html'}} ,
+     "/style.css" : { location :"../public/style.css",
+                      type : {'Content-Type':'text/css'}},
+     "/matchesPlayedPerYear.json" : { location :"../output/matchesPlayedPerYear.json",
+                                       type : {'Content-Type':'application/json'}},
+     "/extraRunsConcededPerTeam.json" : { location :"../output/extraRunsConcededPerTeam.json",
+                                    type : {'Content-Type':'application/json'}},
+     "/matchesWonPerTeamPerYear.json" : { location :"../output/matchesWonPerTeamPerYear.json",
+                                       type : {'Content-Type':'application/json'}},
+     "/topTenBowlers.json" : { location :"../output/topTenBowlers.json",
+                                       type : {'Content-Type':'application/json'}},
+     "/app.js" : { location :"../public/app.js",
+                        type : {'Content-Type':'text/javascript'}}
+}
+
+const server  = http.createServer((request,response)=>{
+    let requrl= request.url;
+    if(URL.hasOwnProperty(requrl) )
+    {
+    let result = getContent(URL[requrl].location)
         .then((content)=>{
-            response.writeHead(200,{'Content-Type':'text/html'})
+            response.writeHead(200,URL[requrl].type)
             response.write(content);
             response.end();
         })
         .catch((err)=>{
             errorHandler(res,err)
-        })
-   }
-   else if(request.url == '/style.css'){
-    let result = getContent("../public/style.css")
-    .then((content)=>{
-        response.writeHead(200,{'Content-Type':'text/css'})
-        response.write(content);
-        response.end();
-       
-    })
-    .catch((err)=>{
-        errorHandler(res,err)
-    })
-   }
-   else if(request.url == "/matchesPlayedPerYear.json"){
-    let result = getContent("../output/matchesPlayedPerYear.json")
-    .then((content)=>{
-        response.writeHead(200,{'Content-Type':'application/json'})
-        response.write(content);
-        response.end();
-    })
-    .catch((err)=>{
-        errorHandler(res,err)
-    })
-    }
-    else if(request.url == "/matchesWonPerTeamPerYear.json"){
-        let result = getContent("../output/matchesWonPerTeamPerYear.json")
-        .then((content)=>{
-            response.writeHead(200,{'Content-Type':'application/json'})
-            response.write(content);
-            response.end();
-        })
-        .catch((err)=>{
-            errorHandler(res,err)
-        })
-    }
-    else if(request.url == "/extraRunsConcededPerTeam.json"){
-        let result = getContent("../extraRunsConcededPerTeam.json")
-        .then((content)=>{
-            response.writeHead(200,{'Content-Type':'application/json'})
-            response.write(content);
-            response.end();
-            })
-            .catch((err)=>{
-                errorHandler(res,err)
-            })
-    }
-    else if(request.url == "/topTenBowlers.json"){
-        let result = getContent("../output/topTenBowlers.json")
-        .then((content)=>{
-            response.writeHead(200,{'Content-Type':'application/json'})
-            response.write(content);
-            response.end();
-        })
-        .catch((err)=>{
-            errorHandler(res,err)
-        })
-    }
-    else if(request.url == "/app.js"){
-    let result = getContent("../public/app.js")
-    .then((content)=>{
-        response.writeHead(200,{'Content-Type':'text/javascript'})
-        response.write(content);
-        response.end();
-    })
-    .catch((err)=>{
-        errorHandler(res,err)
-    })
+        })  
     }
     else{
         response.writeHead(404,{'Content-Type':'text/html'})
