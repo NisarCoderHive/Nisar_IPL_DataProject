@@ -1,5 +1,5 @@
 function matchesWonPerYear(){
-fetch('/matchesPlayedPerYear.json')
+    fetch('/matchesPlayedPerYear.json')
     .then((response)=> {
         return response.json();
     })
@@ -8,68 +8,7 @@ fetch('/matchesPlayedPerYear.json')
             for(let year in data){
                  array.push([year,data[year]])
             }
-           
-            Highcharts.setOptions({
-                chart: {
-                    backgroundColor: {
-                        linearGradient: [0, 0, 500, 500],
-                        stops: [
-                            [0, 'rgb(255, 255, 255)'],
-                            [1, 'rgb(240, 240, 255)']
-                        ]
-                    },
-                    borderWidth: 2,
-                    plotBackgroundColor: 'rgba(255, 255, 255, .9)',
-                    plotShadow: true,
-                    plotBorderWidth: 1
-                }
-            });
-            
-
-            Highcharts.chart('chart1', {
-                chart: {
-                    type: 'column'
-                },
-                title: {
-                    text: 'Number of Matches Played Per Year',
-                    style: {
-                        fontSize: '2em',
-                        color: 'brown'
-                    }
-                },
-               
-                xAxis: {
-                    type: 'category',
-                    labels: {
-                        rotation: 0,
-                        style: {
-                            fontSize: '13px',
-                            fontFamily: 'Verdana, sans-serif',
-                            color:'blue'
-                        }
-                    }
-                }, 
-                yAxis: {
-                    min: 0,
-                    title: {
-                        text: 'Number of Matches Played'
-                    }
-                },
-                legend: {
-                    enabled: false
-                },
-                tooltip: {
-                    pointFormat: 'Matches: <b>{point.y}</b>'
-                },
-                series: [{
-                    name: 'Number Of Matches',
-                    data: array,
-                    color:'blue'
-                  ,
-                }]
-            });
-
-       // viewData(data);
+            viewChart(array,'chart1',"Matches Played In Each Year","Number of Matches")
     })
     .catch((err)=> {
         console.log('error: ' + err);
@@ -77,33 +16,131 @@ fetch('/matchesPlayedPerYear.json')
 }
 matchesWonPerYear();
 
-
 function matchesWonPerTeamPerYear(){
     fetch('/matchesWonPerTeamPerYear.json')
         .then((response)=> {
             return response.json();
         })
         .then((data)=> {
-            let array=[]
-                for(let year in data["2015"]){
-                    // let t=[];
-                    // for(let team in data[year]){
-                    //     t.push(team)
-                    // }
-                        
-                    array.push([year,data["2015"][year]])
-                    
+            var series = [];
+            var seriesObj={};
+            var catArray =[]
+            for(const [dat,dataobj] of Object.entries(data))
+            {
+                catArray.push(dat);
+                for(const [team,numwon] of Object.entries(dataobj)){
+                if(seriesObj.hasOwnProperty(team))
+                {
+                  seriesObj[team]['data'].push(numwon)
                 }
-                let array1=[]
-                for(let year in data["2013"]){
-                    // let t=[];
-                    // for(let team in data[year]){
-                    //     t.push(team)
-                    // }
-                        
-                    array1.push([year,data["2013"][year]])
-                    
+                else{
+                  seriesObj[team]={name:'',data:[]};
+                  seriesObj[team]['name']=team;
+                  seriesObj[team]['data'].push(numwon)
                 }
+                }
+          }
+            
+            for(const [t,obj] of Object.entries(seriesObj)){
+              series.push(obj)
+            }
+            Highcharts.chart('chart2', {
+                    chart: {
+                        type: 'column'
+                    },
+                    title: {
+                        text: 'Matches  Won Per Each Team '
+                    },
+                    xAxis: {
+                        categories: catArray
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: 'Matches Won'
+                        },
+                        stackLabels: {
+                            enabled: true,
+                            style: {
+                                fontWeight: 'bold',
+                                color: ( // theme
+                                    Highcharts.defaultOptions.title.style &&
+                                    Highcharts.defaultOptions.title.style.color
+                                ) || 'gray'
+                            }
+                        }
+                    },
+                    legend: {
+                        align: 'right',
+                        x: -30,
+                        verticalAlign: 'top',
+                        y: 25,
+                        floating: true,
+                        backgroundColor:
+                            Highcharts.defaultOptions.legend.backgroundColor || 'white',
+                        borderColor: '#CCC',
+                        borderWidth: 1,
+                        shadow: false
+                    },
+                    tooltip: {
+                        headerFormat: '<b>{point.x}</b><br/>',
+                        pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+                    },
+                    plotOptions: {
+                        column: {
+                            stacking: 'normal',
+                            dataLabels: {
+                                enabled: true
+                            }
+                        }
+                    },
+                    series: series
+                });
+        })
+        .catch((err)=> {
+            console.log('error: ' + err);
+        });
+    }
+    matchesWonPerTeamPerYear();
+
+function topTenBowlers(){
+        fetch('/topTenBowlers.json')
+            .then((response)=> {
+                return response.json();
+            })
+            .then((data)=> {
+                let array= [];
+                    for(let index in data){
+                       array.push([index,data[index]])
+                        }
+                     viewChart(array,'chart3','Top Ten Bowlers of 2016',"Economy")
+              })
+            .catch((err)=> {
+                console.log('error: ' + err);
+            });
+        }
+topTenBowlers();
+
+function extraRunsConceded(){
+            fetch('/extraRunsConcededPerTeam.json')
+                .then((response)=> {
+                    return response.json();
+                })
+                .then((data)=> {
+                    let array=[]
+                        for(let year in data){
+                             array.push([year,data[year]])
+                        }
+                  viewChart(array,"chart4","Extra Runs Conceded By Each Team in 2016","Extra Runs")
+                })
+                .catch((err)=> {
+                    console.log('error: ' + err);
+                });
+}
+extraRunsConceded();
+
+function viewChart(array,chartid,chartTitle,yaxisTitle)
+            {
                 Highcharts.setOptions({
                     chart: {
                         backgroundColor: {
@@ -119,14 +156,12 @@ function matchesWonPerTeamPerYear(){
                         plotBorderWidth: 1
                     }
                 });
-                
-    
-                Highcharts.chart('chart2', {
+                Highcharts.chart(chartid, {
                     chart: {
                         type: 'column'
                     },
                     title: {
-                        text: 'Matches Won By each Team in 2015 vs 2013',
+                        text: chartTitle,
                         style: {
                             fontSize: '2em',
                             color: 'brown'
@@ -147,116 +182,20 @@ function matchesWonPerTeamPerYear(){
                     yAxis: {
                         min: 0,
                         title: {
-                            text: 'Matches Won '
+                            text: yaxisTitle
                         }
                     },
                     legend: {
-                        enabled: true
+                        enabled: false
                     },
                     tooltip: {
                         pointFormat: '<b>{point.y}</b>'
                     },
                     series: [{
-                        name: '2015',
-                        data: array, 
+                        name: 'Number Of Matches',
+                        data: array,
                         color:'blue'
                       
-                    },{
-                        name: '2013',
-                        data: array1, 
-                        color:'red'
-                      
-                    }],
-                    
+                    }]
                 });
-    
-           // viewData(data);
-        })
-        .catch((err)=> {
-            console.log('error: ' + err);
-        });
-    }
-    matchesWonPerTeamPerYear();
-
-
-    function topTenBowlers(){
-        fetch('/topTenBowlers.json')
-            .then((response)=> {
-                return response.json();
-            })
-            .then((data)=> {
-                let array= [];
-                    for(let index in data){
-                        
-                       array.push([index,data[index]])
-                       
-                     }
-                   
-                    Highcharts.setOptions({
-                        chart: {
-                            backgroundColor: {
-                                linearGradient: [0, 0, 500, 500],
-                                stops: [
-                                    [0, 'rgb(255, 255, 255)'],
-                                    [1, 'rgb(240, 240, 255)']
-                                ]
-                            },
-                            borderWidth: 2,
-                            plotBackgroundColor: 'rgba(255, 255, 255, .9)',
-                            plotShadow: true,
-                            plotBorderWidth: 1
-                        }
-                    });
-                    
-        
-                    Highcharts.chart('chart3', {
-                        chart: {
-                            type: 'column'
-                        },
-                        title: {
-                            text: 'Top Ten Bowlers ipl',
-                            style: {
-                                fontSize: '2em',
-                                color: 'brown'
-                            }
-                        },
-                       
-                        xAxis: {
-                            type: 'category',
-                            labels: {
-                                rotation: 0,
-                                style: {
-                                    fontSize: '13px',
-                                    fontFamily: 'Verdana, sans-serif',
-                                    color:'blue'
-                                }
-                            }
-                        }, 
-                        yAxis: {
-                            min: 0,
-                            title: {
-                                text: 'Economy'
-                            }
-                        },
-                        legend: {
-                            enabled: true
-                        },
-                        tooltip: {
-                            pointFormat: 'Economy: <b>{point.y}</b>'
-                        },
-                        series: [{
-                            name: 'Economy',
-                            data: array,
-                            color:'blue'
-                          ,
-                        }]
-                    });
-        
-               // viewData(data);
-            })
-            .catch((err)=> {
-                console.log('error: ' + err);
-            });
-        }
-        topTenBowlers();
-
+            }
