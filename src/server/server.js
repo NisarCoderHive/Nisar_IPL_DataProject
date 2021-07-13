@@ -1,5 +1,7 @@
 const http = require('http');
+
 const fs = require('fs');
+
 const URL = 
     { "/"         : { location :"../public/index.html",
                      type : {'Content-Type':'text/html'}} ,
@@ -21,7 +23,7 @@ const server  = http.createServer((request,response)=>{
     let requrl= request.url;
     if(URL.hasOwnProperty(requrl) )
     {
-    let result = getContent(URL[requrl].location)
+     let result = getContent(URL[requrl].location)
         .then((content)=>{
             response.writeHead(200,URL[requrl].type)
             response.write(content);

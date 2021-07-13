@@ -1,4 +1,3 @@
-const csv = require('csvtojson');
 
 function matchesPlayedPerYear(matches){
     if (typeof matches === 'undefined' || matches.length == 0 ) {
@@ -72,10 +71,17 @@ function topTenBowlers(matches,deliveries,year){
         totalBowlers = deliveries.reduce((totalBowlers, delivery) => {
         if (delivery['match_id'] in matches) {
             const bowlerName = delivery.bowler;
+                if(bowlerName != null)
                      if(bowlerName in totalBowlers){
-                       totalBowlers[bowlerName] += parseInt(delivery['total_runs']) ;
+                        totalBowlers[bowlerName]['runs'] += parseInt(delivery['total_runs']) ;
+                            if(delivery['noball_runs']==0 && delivery['wide_runs']==0)
+                            totalBowlers[bowlerName]['balls'] += 1;
+                        
                     }else{
-                        totalBowlers[bowlerName] = parseInt(delivery['total_runs']);
+                        totalBowlers[bowlerName]={};
+                        totalBowlers[bowlerName]['runs'] = parseInt(delivery['total_runs']);
+                        if(delivery['noball_runs'] == 0 && delivery['wide_runs'] == 0)
+                            totalBowlers[bowlerName]['balls'] = 1;
                     }
                }
             return totalBowlers;   
@@ -84,17 +90,18 @@ function topTenBowlers(matches,deliveries,year){
     for (const [key, value] of Object.entries(totalBowlers)) {
         let obj={};
         obj['BowlerName']= key ;
-        obj['runs'] = value;
+        obj['Economy'] = (value['runs'] / value['balls']).toFixed(2);
+        if(obj['Economy']!= "NaN")
         result.push(obj)
         }
-        result.sort((obj1,obj2) =>obj1['runs'] -obj2['runs']);
+        result.sort((obj1,obj2) =>obj1['Economy'] -obj2['Economy']);
         let finalresult = [];
         for( i = 0 ;i < 10 ;i++){
             finalresult.push(result[i])
         }
         var res= {}
         for(obj of finalresult){
-        res[obj['BowlerName']]= obj['runs'];
+        res[obj['BowlerName']]= Number(obj['Economy']);
         }
 
         return res;
