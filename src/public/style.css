@@ -1,28 +1,8 @@
 h1{
     font: 'Verdana, sans-serif';
     color : blue;
+}
 
-    
-}
-body{
-    text-align:center;
-}
-/* #chart1{
-    width:60%;
-    margin:0 auto;
-    }
-#chart2{
-    width:60%;
-    margin:0 auto;
-}
-#chart3{
-    width:60%;
-    margin:0 auto;
-}
-#chart4{
-    width:60%;
-    margin:0 auto;
-} */
 div{
     width:80%;
     margin:0 auto;
