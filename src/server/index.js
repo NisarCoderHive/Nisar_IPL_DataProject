@@ -33,12 +33,8 @@ csv()
         }
    });
 });
+
 // Function to store json data
-
-const  resolvepath = (dirname,location)=>
-{
-
-}
 const  storeToJson = (data,location)=>{
     try {
          fs.writeFile(location, JSON.stringify(data),(err)=>{console.log(err)})
