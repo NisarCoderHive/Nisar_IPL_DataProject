@@ -1,5 +1,7 @@
 const http = require('http');
 
+const path = require('path');
+
 const fs = require('fs');
 
 const URL = 
@@ -41,7 +43,7 @@ const server  = http.createServer((request,response)=>{
 
 let getContent = (location)=>{
     return new Promise((resolve,reject)=>{
-        fs.readFile(location,'utf8',(err,data)=>{
+        fs.readFile(path.resolve(__dirname,location),'utf8',(err,data)=>{
             if(err){
                 reject(err)
             }
