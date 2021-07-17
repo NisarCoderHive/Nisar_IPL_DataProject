@@ -73,23 +73,21 @@ function executeQuery(queryText){
     return new Promise((resolve,reject) => {
       pool.connect((err,client,done)=>{
         try{
-      client.query(queryText, 
-          (error, queryOutput) => {
+          client.query(queryText,(error, queryOutput) => {
             if(error){
               return reject(error)
             } else{
               return resolve(queryOutput)
-            }
-
-        });}
-        catch(err){
+            }        
+           });
+          }catch(err){
           console.log(err);
-        }
-        finally{
+          }
+          finally{
           done();
-        }
-      })
-     })
+          }
+      });
+     });
   }
  
 module.exports ={executeQuery,
