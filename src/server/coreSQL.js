@@ -4,15 +4,9 @@ const Pool = require("pg").Pool;
 
 const fastcsv = require("fast-csv");
 
-const pool = new Pool({
-  host: "localhost",
-  user: "postgres",
-  database: "IPL",
-  password: "postgres",
-  port: 5432,
-  idleTimeoutMillis: 0,
-  connectionTimeoutMillis: 50000
-});
+const connection = require('./connection');
+
+const pool = new Pool(connection);
  
 function store(csvfile,query){
     let stream = fs.createReadStream(csvfile);
