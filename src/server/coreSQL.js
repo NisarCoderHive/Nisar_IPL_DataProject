@@ -4,10 +4,12 @@ const Pool = require("pg").Pool;
 
 const fastcsv = require("fast-csv");
 
+require('dotenv').config();
+
 const connection = require('./connection');
 
 const pool = new Pool(connection);
- 
+
 function store(csvfile,query){
     let stream = fs.createReadStream(csvfile);
     let csvData = [];
@@ -84,7 +86,7 @@ function executeQuery(queryText){
      });
   }
  
-module.exports ={executeQuery,
-store,
-creatTable
-}
+module.exports = { executeQuery,
+                   store,
+                   creatTable
+                 }

@@ -1,9 +1,3 @@
-const fs = require("fs");
-
-const Pool = require("pg").Pool;
-
-const fastcsv = require("fast-csv");
-
 const sql = require('./coreSQL');
 
 const sqlObject= {
@@ -15,29 +9,19 @@ const sqlObject= {
   "query2" : `select season, winner as "Team", count(*) as "Matcheswon" from matches group by season,winner order by season`,
   "query3" : `select bowling_team, sum(extra_runs) as "ExtraRunsconceded" from matches  inner join deliveries on matches.id=deliveries.matchid where season='2016' group by deliveries.bowling_team`,
   "query4" : `select  bowler,sum(total_runs) as "total" from deliveries inner join matches on id=matchid where season='2015' group by bowler order by total limit 10`
-}
+};
 
 
-sql.creatTable(sqlObject.createMatchesTable);
 
-sql.creatTable(sqlObject.createDeliveriesTable);
+sql.creatTable(sqlObject.createMatchesTable)
+
+sql.creatTable(sqlObject.createDeliveriesTable)
+
+sql.store(sqlObject.insertDeliveries.csvfile,sqlObject.insertDeliveries.query)
+ 
+sql.store(sqlObject.insertMatches.csvfile,sqlObject.insertMatches.query)
 
 
-sql.store(sqlObject.insertDeliveries.csvfile,sqlObject.insertDeliveries.query);
-
-sql.store(sqlObject.insertMatches.csvfile,sqlObject.insertMatches.query);
-
-sql.executeQuery(sqlObject.query1)
-.then(matchesPlayedPerYear =>{
-  console.log(matchesPlayedPerYear.rows);
-})
-.catch(err=> console.log(err))
-
-sql.executeQuery(sqlObject.query2)
-.then(matchesWonPerTeamPerYear =>{
-  console.log(matchesWonPerTeamPerYear.rows);
-})
-.catch(err=> console.log(err))
 
 sql.executeQuery(sqlObject.query1)
 .then(matchesPlayedPerYear =>{
@@ -45,11 +29,13 @@ sql.executeQuery(sqlObject.query1)
 })
 .catch(err=> console.log(err))
 
+
 sql.executeQuery(sqlObject.query2)
 .then(matchesWonPerTeamPerYear =>{
   console.log(matchesWonPerTeamPerYear.rows);
 })
 .catch(err=> console.log(err))
+
 
 sql.executeQuery(sqlObject.query3)
 .then(extraRunsConcededPerTeam=>{
@@ -57,9 +43,14 @@ sql.executeQuery(sqlObject.query3)
 })
 .catch(err=> console.log(err))
 
+
 sql.executeQuery(sqlObject.query4)
 .then(topTenBowlers =>{
   console.log(topTenBowlers.rows);
 })
 .catch(err=> console.log(err))
+
+
+
+
 
